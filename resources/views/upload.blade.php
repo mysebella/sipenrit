@@ -198,7 +198,7 @@
 
                                 @if ($document[$i] == null)
                                     <div class="w-full h-96 flex justify-center items-center">
-                                        <div class="opacity-80">
+                                        <div class="opacity-80 flex flex-col items-center">
                                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
                                                 stroke-linecap="round" stroke-linejoin="round" height="200px" width="200px"
                                                 xmlns="http://www.w3.org/2000/svg">
@@ -211,6 +211,10 @@
                                                 <path d="M21 7v10"></path>
                                             </svg>
                                             <p>Document Belum Di Upload</p>
+
+                                            <a href="/upload/{{ $i }}"
+                                                class="py-2 px-3 bg-blue-500 rounded text-white mt-3">Upload
+                                                Document</a>
                                         </div>
                                     </div>
                                 @else

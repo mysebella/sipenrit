@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $user = User::create([
             "name" => "Admin Sipenrit",
             "birth" => "18 September 2015",
-            "Pension" => "18 September 2015",
+            "Pension" => "18 September 2068",
             "nrp" => "Ajendam V/Brawijaya",
             'rank' => "Letnan Satu",
             'role' => "admin",

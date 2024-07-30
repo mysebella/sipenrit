@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GeneratePDF;
 use App\Models\Document;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
@@ -49,8 +49,19 @@ class UploadController extends Controller
         foreach ($files as $file) {
             if ($request->hasFile($file)) {
                 $requestFile = $request->file($file);
+
+                // Validasi file
+                $request->validate([
+                    $file => 'mimes:jpg,jpeg,png|max:2048',
+                ]);
+
+                Log::info('Uploading file: ' . $requestFile->getClientOriginalName());
+
                 $filename = str_replace(' ', '-', $file . '-' . strtolower($userName['name']) . '-' . Cookie::get('uix') . '.' . $requestFile->extension());
                 $requestFile->storeAs($path, $filename);
+
+                Log::info('Stored file as: ' . $filename);
+
                 $fileUploaded[$file] = $filename;
             }
         }
@@ -62,5 +73,29 @@ class UploadController extends Controller
         }
 
         User::where('id', Cookie::get('id'))->update(['active' => 'active']);
+    }
+
+    public function update(Request $request, $document)
+    {
+        $path = 'public/document/';
+
+        if ($request->hasFile($document)) {
+            $file = $request->file($document);
+
+            $request->validate([
+                $document => 'mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+            Log::info('Uploading file: ' . $file->getClientOriginalName());
+
+            $userName = User::select('name')->where('nrp', Cookie::get('uix'))->first();
+
+            $filename = str_replace(' ', '-', $document . '-' . strtolower($userName['name']) . '-' . Cookie::get('uix') . '.' . $file->extension());
+            $file->storeAs($path, $filename);
+
+            Log::info('Stored file as: ' . $filename);
+            Document::where('user_id', Cookie::get('id'))->update([$document => $filename]);
+            Document::where('user_id', Cookie::get('id'))->update(['telephone_btn' => $request->telephone_btn, 'rekening_btn' => $request->rekening_btn]);
+        }
     }
 }

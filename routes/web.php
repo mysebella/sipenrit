@@ -53,10 +53,24 @@ Route::middleware(['isUserAuth'])->prefix('upload')->controller(UploadController
         ];
         return view('upload', ['document' => Document::where('user_id', Cookie::get('id'))->first(), "ii" => $files]);
     })->name('upload');
+
+    Route::get('{document}', function ($document) {
+        return view('upload-one-document', [
+            "document" => $document
+        ]);
+    })->name('update.document');
+
+    Route::post('update/{document}', 'update')->name('upload.update');
     Route::post('store', 'index')->name('upload.post');
 });
 
 Route::middleware(['isAdmin'])->prefix('dashboard')->controller(DashboardController::class)->group(function () {
     Route::get('', 'index')->name('dashboard');
     Route::get('show/{nrp}', 'show')->name('dashboard.show');
+});
+
+Route::get('link', function () {
+    $target = storage_path('/app/public/');
+    $symlink = $_SERVER['DOCUMENT_ROOT'] . '/storage';
+    symlink($target, $symlink);
 });
