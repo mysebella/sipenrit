@@ -42,7 +42,7 @@
                 </div>
 
                 <p class="my-2 text-black">NRP</p>
-                <input name="nrp" placeholder="Masukan NRP" type="number" required
+                <input name="nrp" placeholder="Masukan NRP" type="text" required
                     class="p-3 w-full mb-2 outline-blue-400 border border-gray-100 rounded-lg">
 
                 <p class="my-2 text-black">Pangkat</p>
@@ -74,4 +74,10 @@
             </form>
         </div>
     </main>
+@endsection
+
+@section('javascript')
+    <script>
+        Swal.fire("", "Silahkan mendaftarkan diri terlebih dahulu", "info");
+    </script>
 @endsection

@@ -39,7 +39,9 @@ class AuthController extends Controller
             Document::create(['user_id' => $user->id]);
 
             if ($user) {
-                return redirect(route('login.view'))->with('success', 'Pendaftaran Berhasil');
+                return redirect(route('home'))
+                    ->with('success', 'Pendaftaran Berhasil')
+                    ->withCookies([Cookie::make('uix', $request->nrp), Cookie::make('id', $user->id)]);;
             }
         } else {
             return back()->with('error', 'Account Sudah Terdaftar');

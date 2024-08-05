@@ -6,11 +6,14 @@
 
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Insignia_of_the_Indonesian_Army.svg/170px-Insignia_of_the_Indonesian_Army.svg.png"
                 class="w-40 m-auto" />
-            <p class="text-black text-center my-4 text-xl font-medium">Selamat datang di SIPENRIT</p>
+
+            <div class="my-4">
+                <p class="text-black text-center text-xl font-medium">Selamat datang di SIPENRIT</p>
+                <p class="text-black text-center">(Sistem Informasi Pensiunan Prajurit)</p>
+            </div>
 
             <form class="mt-2" action="{{ route('login') }}" method="POST">
                 @csrf
-                <p class="my-2 text-black">NRP</p>
                 <input name="nrp" placeholder="NRP" type="text" required
                     class="p-3 w-full mb-2 outline-blue-400 border border-gray-100 rounded-lg">
 
@@ -23,4 +26,22 @@
             </div>
         </div>
     </main>
+@endsection
+
+@section('javascript')
+    <script>
+        Swal.fire({
+            icon: 'info',
+            text: "Pertama kali mengunakan aplikasi ini?",
+            showDenyButton: true,
+            confirmButtonText: "Iyha",
+            denyButtonText: `Tidak`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.location = "/auth/register"
+            } else if (result.isDenied) {
+                Swal.fire("", "Silahkan Masuk Mengunakan NRP yang di daftarkan", "info");
+            }
+        });
+    </script>
 @endsection
