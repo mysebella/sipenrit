@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
+    // Menampilkan halaman upload dan menangani proses upload
     public function index(Request $request)
     {
+        // Daftar nama-nama file yang diizinkan untuk diupload
         $files = [
             'dcpp',
             'permohonan',
@@ -37,64 +39,90 @@ class UploadController extends Controller
             'pasphoto_berwarna_istri',
         ];
 
+        // Menentukan path penyimpanan file
         $path = 'public/document/';
 
+        // Membuat direktori jika belum ada
         if (!Storage::exists($path)) {
             Storage::makeDirectory($path);
         }
 
+        // Menyimpan nama-nama file yang diupload
         $fileUploaded = [];
+
+        // Mengambil nama pengguna dari cookie
         $userName = User::select('name')->where('nrp', Cookie::get('uix'))->first();
 
+        // Iterasi setiap nama file untuk proses upload
         foreach ($files as $file) {
+            // Mengecek jika file ada di dalam request
             if ($request->hasFile($file)) {
                 $requestFile = $request->file($file);
 
-                // Validasi file
+                // Validasi file yang diupload
                 $request->validate([
-                    $file => 'mimes:jpg,jpeg,png|max:2048',
+                    $file => 'mimes:jpg,jpeg,png',
                 ]);
 
-                Log::info('Uploading file: ' . $requestFile->getClientOriginalName());
+                // Mencatat informasi file yang diupload
+                Log::info('Mengupload file: ' . $requestFile->getClientOriginalName());
 
+                // Membuat nama file yang unik
                 $filename = str_replace(' ', '-', $file . '-' . strtolower($userName['name']) . '-' . Cookie::get('uix') . '.' . $requestFile->extension());
                 $requestFile->storeAs($path, $filename);
 
-                Log::info('Stored file as: ' . $filename);
+                // Mencatat informasi nama file yang disimpan
+                Log::info('Menyimpan file sebagai: ' . $filename);
 
+                // Menyimpan nama file ke dalam array
                 $fileUploaded[$file] = $filename;
             }
         }
 
+        // Memperbarui informasi dokumen di database untuk pengguna
         Document::where('user_id', Cookie::get('id'))->update(['telephone_btn' => $request->telephone_btn, 'rekening_btn' => $request->rekening_btn]);
 
+        // Memperbarui informasi dokumen yang diupload di database
         foreach ($fileUploaded as $key => $value) {
             Document::where('user_id', Cookie::get('id'))->update([$key => $value]);
         }
 
+        // Mengubah status pengguna menjadi aktif
         User::where('id', Cookie::get('id'))->update(['active' => 'active']);
     }
 
+    // Mengupdate dokumen yang sudah diupload
     public function update(Request $request, $document)
     {
+        // Menentukan path penyimpanan file
         $path = 'public/document/';
 
+        // Mengecek jika file ada di dalam request
         if ($request->hasFile($document)) {
             $file = $request->file($document);
 
+            // Validasi file yang diupload
             $request->validate([
                 $document => 'mimes:jpg,jpeg,png|max:2048',
             ]);
 
-            Log::info('Uploading file: ' . $file->getClientOriginalName());
+            // Mencatat informasi file yang diupload
+            Log::info('Mengupload file: ' . $file->getClientOriginalName());
 
+            // Mengambil nama pengguna dari cookie
             $userName = User::select('name')->where('nrp', Cookie::get('uix'))->first();
 
+            // Membuat nama file yang unik
             $filename = str_replace(' ', '-', $document . '-' . strtolower($userName['name']) . '-' . Cookie::get('uix') . '.' . $file->extension());
             $file->storeAs($path, $filename);
 
-            Log::info('Stored file as: ' . $filename);
+            // Mencatat informasi nama file yang disimpan
+            Log::info('Menyimpan file sebagai: ' . $filename);
+
+            // Memperbarui informasi dokumen di database
             Document::where('user_id', Cookie::get('id'))->update([$document => $filename]);
+
+            // Memperbarui informasi telephone_btn dan rekening_btn di database
             Document::where('user_id', Cookie::get('id'))->update(['telephone_btn' => $request->telephone_btn, 'rekening_btn' => $request->rekening_btn]);
         }
     }

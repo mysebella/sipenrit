@@ -30,7 +30,7 @@
                     <p>Jika Document Belum Siap Semua, Silahkan Upload yang sudah tersedia saja</p>
                 </div>
                 @if (App\Models\User::where('id', Cookie::get('id'))->first()->active == 'nonactive')
-                    <div class="w-full lg:w-[50%] m-auto p-6 rounded-lg">
+                    <div class="w-full lg:w-[50%] m-auto my-6 rounded-lg">
                         <p class="text-lg font-semibold font-poppins text-black">Upload Document</p>
                         <div>
                             <form class="mb-10" id="uploadForm" action="{{ route('upload.post') }}" method="POST"
@@ -269,19 +269,29 @@
         $(document).ready(function() {
             $('#uploadForm').ajaxForm({
                 beforeSend: function() {
+                    console.log("Preparing to upload...");
                     Swal.fire({
                         title: 'Uploading...',
-                        html: '<div id="swal-progress-bar" style="width: 100%; background: #ccc;"><div style="width: 0%; background: #4caf50; height: 24px; color: #fff; text-align: center;">0%</div></div>',
+                        html: `<div id="swal-progress-bar" style="width: 100%; background: #ccc;"><div style="width: 0%; background: #4caf50; height: 24px; color: #fff; text-align: center;">0%</div></div>`,
                         allowOutsideClick: false,
                         showConfirmButton: false
                     });
                 },
                 uploadProgress: function(event, position, total, percentComplete) {
+                    console.log("Upload progress: " + percentComplete + "%");
                     var percentValue = percentComplete + '%';
                     $('#swal-progress-bar div').width(percentValue).html(percentValue);
                 },
-                success: function() {
+                success: function(response) {
+                    console.log("Upload successful: ", response);
                     $('#swal-progress-bar div').width('100%').html('100%');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Upload failed: ", error);
+                    Swal.fire({
+                        text: "Failed to upload document",
+                        icon: "error"
+                    });
                 },
                 complete: function(xhr) {
                     Swal.fire({
@@ -292,7 +302,6 @@
                     });
                 }
             });
-
         });
     </script>
 

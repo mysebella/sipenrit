@@ -12,12 +12,13 @@ class DocumentController extends Controller
         // Ambil data dokumen bersama relasi user
         $document = Document::with('user')->where('user_id', $id)->first();
 
-        $nonNullColumns = [];
+        $nonNullColumns = []; // dcpp
 
         if ($document) {
             // Dapatkan atribut model sebagai array
             $attributes = $document->getAttributes();
 
+            // jika si user sudah pernah upload document
             foreach ($attributes as $key => $value) {
                 if (!is_null($value)) {
                     // Tambahkan kolom yang tidak null ke array hasil
